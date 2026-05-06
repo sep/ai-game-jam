@@ -1,4 +1,5 @@
 ---
+name: build-my-game
 description: "Create a custom Three.js video game for NCWIT Indiana AIC Awards Event. Use this skill when a participant wants to make their game. Trigger phrases: create my game, make a game, build my game, start my game, help me make a game."
 ---
 
@@ -6,17 +7,29 @@ description: "Create a custom Three.js video game for NCWIT Indiana AIC Awards E
 
 You are helping a high school student create a custom 3D video game using Three.js at the NCWIT Indiana AIC Awards Event. This is their first time using an AI coding agent — make it fun, encouraging, and impressive!
 
+## Fast Start Behavior
+
+Start the skill with the interview immediately. Do not analyze the entire repository first.
+
+Repo fast-path reference: see .github/copilot/skills/build-my-game/build-my-game-fast-path.md.
+
+- Before the interview, rely only on the known repo contract: games live in `games/<participant>/index.html`, the reference template is `games/_template/index.html`, and the registry is `games/manifest.json`.
+- Do not read unrelated files such as `README.md`, `index.html`, or `styles.css` unless the participant explicitly asks to change the arcade site or documentation.
+- After the participant answers, read only the files needed to generate the game and update the manifest.
+- Prefer one targeted read of the template and one targeted read of the manifest over broader codebase exploration.
+
 ## Step 1: Interview the Participant
 
 Use the `vscode_askQuestions` tool to ask ALL of the following questions in a single call:
+
+- For questions with predefined choices, provide those choices in the tool `options` field so participants can click to select.
+- Do not rely on inline suggestion text alone for choice-based questions.
 
 **Questions to ask:**
 
 1. **Your Name** — "What's your name? (This will be used for your game's folder and credits)"
 
-2. **Game Title** — "What do you want to call your game?"
-
-3. **Game Genre** — "Pick a game type!" with options:
+2. **Game Genre** — "Pick a game type!" with options:
    - `Dodge It!` (description: "Dodge falling obstacles — survive as long as you can!")
    - `Collector` (description: "Collect items while avoiding hazards — grow your score!")
    - `Space Shooter` (description: "Fly a ship and blast enemies out of the sky!")
@@ -30,7 +43,7 @@ Use the `vscode_askQuestions` tool to ask ALL of the following questions in a si
    - `Survival Arena` (description: "Waves of enemies close in — survive as long as you can!")
    - `Platformer` (description: "Jump between floating 3D platforms — don't fall!")
 
-4. **Game Setting** — "What world does your game live in?" with options:
+3. **Game Setting** — "What world does your game live in?" with options:
    - `Outer Space` (description: "Stars, planets, and spaceships — pew pew!")
    - `Underwater` (description: "Deep sea with fish, submarines, and coral reefs")
    - `Medieval Fantasy` (description: "Knights, castles, dragons, and magic")
@@ -43,7 +56,7 @@ Use the `vscode_askQuestions` tool to ask ALL of the following questions in a si
    - `Cyberpunk City` (description: "Flying cars, holograms, neon rain, and robots")
    - `Custom` (description: "Describe your own world!")
 
-5. **Color Theme** — "Pick a vibe!" with options:
+4. **Color Theme** — "Pick a vibe!" with options:
    - `Neon Cyber` (description: "Electric blues, hot pinks, glowing greens")
    - `Sunset` (description: "Warm oranges, reds, and purples")
    - `Ocean` (description: "Deep blues, teals, and seafoam")
@@ -51,7 +64,7 @@ Use the `vscode_askQuestions` tool to ask ALL of the following questions in a si
    - `Monochrome` (description: "Clean black, white, and grays")
    - `Custom` (description: "Tell me your own colors!")
 
-6. **Special Feature** — "Want to add a twist? Pick one or describe your own!" with options:
+5. **Special Feature** — "Want to add a twist? Pick one or describe your own!" with options:
    - `Speed Boost` (description: "Game gets faster over time!")
    - `Power-ups` (description: "Collect items for shields, magnets, or slow-mo")
    - `Boss Battle` (description: "A big enemy appears every 30 seconds")
@@ -69,6 +82,8 @@ Use the `vscode_askQuestions` tool to ask ALL of the following questions in a si
    - `Trail of Fire` (description: "Leave a damaging trail behind you that hurts enemies!")
    - `Surprise me!` (description: "I'll pick something cool for you")
 
+6. **Game Title** — "Now that you know what your game is about, what do you want to call it?"
+
 ## Step 2: Generate the Game
 
 After receiving answers, create the game:
@@ -78,6 +93,8 @@ After receiving answers, create the game:
 2. **Build a single-file HTML game** using this structure:
    - Load Three.js from CDN: `<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>`
    - All code inline in a single `index.html` — no external files
+   - Keep all game styling inside that single game file; do not create a separate CSS file
+   - Do not modify the root arcade files (`index.html` or `styles.css`) as part of normal game generation or customization
    - Must include:
      - A `<canvas>` with Three.js renderer
      - Keyboard controls (show control instructions on screen)
