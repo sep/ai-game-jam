@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Behind the Prompt — NCWIT Indiana AIC Awards Event</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+        :root {
+            --bg: #0a0a1a;
+            --card: #12122a;
+            --card-border: #2a2a5a;
+            --accent1: #00e5ff;
+            --accent2: #ff2d95;
+            --accent3: #b388ff;
+            --accent4: #69f0ae;
+            --text: #e0e0f0;
+            --text-dim: #8888aa;
+            --glow-cyan: 0 0 30px rgba(0, 229, 255, 0.3);
+            --glow-pink: 0 0 30px rgba(255, 45, 149, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Space Grotesk', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated background grid */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .poster {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            display: block;
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent1), var(--accent2), var(--accent3));
+            margin: 30px auto 0;
+            border-radius: 2px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent2), var(--accent3));
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 6px 20px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--text-dim);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* ── INTRO CALLOUT ── */
+        .intro-callout {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(255, 45, 149, 0.08));
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 30px 40px;
+            margin-bottom: 50px;
+            text-align: center;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .intro-callout strong {
+            color: var(--accent1);
+        }
+
+        /* ── SECTION LAYOUT ── */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .full-width {
+            margin-bottom: 40px;
+        }
+
+        /* ── CARDS ── */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .card.cyan::before { background: var(--accent1); box-shadow: var(--glow-cyan); }
+        .card.pink::before { background: var(--accent2); box-shadow: var(--glow-pink); }
+        .card.purple::before { background: var(--accent3); }
+        .card.green::before { background: var(--accent4); }
+
+        .card-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+
+        .card.cyan .card-label { color: var(--accent1); background: rgba(0, 229, 255, 0.1); }
+        .card.pink .card-label { color: var(--accent2); background: rgba(255, 45, 149, 0.1); }
+        .card.purple .card-label { color: var(--accent3); background: rgba(179, 136, 255, 0.1); }
+        .card.green .card-label { color: var(--accent4); background: rgba(105, 240, 174, 0.1); }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            margin: 18px 0 10px;
+            color: #fff;
+        }
+
+        .card p, .card li {
+            font-size: 0.92rem;
+            line-height: 1.7;
+            color: var(--text-dim);
+        }
+
+        .card ul, .card ol {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+
+        .card li {
+            margin-bottom: 4px;
+        }
+
+        /* ── CODE BLOCKS ── */
+        .code-block {
+            background: #0d0d20;
+            border: 1px solid #1e1e40;
+            border-radius: 10px;
+            padding: 18px 22px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            line-height: 1.7;
+            overflow-x: auto;
+            margin: 12px 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .code-block .keyword { color: var(--accent2); }
+        .code-block .string { color: var(--accent4); }
+        .code-block .comment { color: var(--text-dim); font-style: italic; }
+        .code-block .prop { color: var(--accent1); }
+        .code-block .value { color: var(--accent3); }
+
+        /* ── OPTION CHIPS ── */
+        .chip-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .chip {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid;
+        }
+
+        .chip.genre { color: var(--accent1); border-color: rgba(0, 229, 255, 0.3); background: rgba(0, 229, 255, 0.06); }
+        .chip.setting { color: var(--accent2); border-color: rgba(255, 45, 149, 0.3); background: rgba(255, 45, 149, 0.06); }
+        .chip.color { color: var(--accent3); border-color: rgba(179, 136, 255, 0.3); background: rgba(179, 136, 255, 0.06); }
+        .chip.feature { color: var(--accent4); border-color: rgba(105, 240, 174, 0.3); background: rgba(105, 240, 174, 0.06); }
+
+        /* ── FLOW DIAGRAM ── */
+        .flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .flow-step {
+            background: rgba(0, 229, 255, 0.08);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 12px;
+            padding: 14px 22px;
+            text-align: center;
+            min-width: 140px;
+        }
+
+        .flow-step .step-num {
+            display: block;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent1);
+            line-height: 1;
+        }
+
+        .flow-step .step-label {
+            font-size: 0.85rem;
+            color: var(--text);
+            margin-top: 6px;
+        }
+
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: var(--accent1);
+            padding: 0 8px;
+        }
+
+        /* ── HIGHLIGHT BOX ── */
+        .highlight-box {
+            background: rgba(255, 45, 149, 0.06);
+            border-left: 3px solid var(--accent2);
+            padding: 14px 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 14px 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .highlight-box.green {
+            background: rgba(105, 240, 174, 0.06);
+            border-left-color: var(--accent4);
+        }
+
+        .highlight-box.cyan {
+            background: rgba(0, 229, 255, 0.06);
+            border-left-color: var(--accent1);
+        }
+
+        /* ── FOOTER ── */
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid var(--card-border);
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .footer .tech-stack {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .footer .tech-badge {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+        }
+
+        /* ── PRINT STYLES ── */
+        @page {
+            size: 36in 48in;
+            margin: 0.75in;
+        }
+
+        @media print {
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            html, body {
+                width: 34.5in;
+            }
+            body { background: white; color: #222; }
+            body::before { display: none; }
+
+            .poster { max-width: 100%; padding: 0.25in; font-size: 14pt; }
+
+            .header { margin-bottom: 28px; }
+            .header::after { margin: 16px auto 0; height: 4px; }
+
+            h1 {
+                -webkit-text-fill-color: #1a1a2e;
+                background: none;
+                color: #1a1a2e;
+                font-size: 56pt;
+                margin-bottom: 8px;
+            }
+
+            .badge {
+                background: #6c5ce7;
+                color: white;
+                font-size: 14pt;
+                padding: 6px 22px;
+                margin-bottom: 12px;
+            }
+
+            .subtitle { color: #444; font-size: 20pt; line-height: 1.4; }
+
+            .intro-callout {
+                background: #f0f0fa;
+                border: 2px solid #6c5ce7;
+                font-size: 15pt;
+                padding: 18px 26px;
+                margin-bottom: 24px;
+                line-height: 1.5;
+            }
+            .intro-callout strong { color: #1a1a2e; }
+
+            .card {
+                border: 2px solid #999;
+                background: #fafafa;
+                break-inside: avoid;
+                page-break-inside: avoid;
+                padding: 18px 22px;
+                margin-bottom: 14px;
+            }
+            .card::before { box-shadow: none !important; height: 4px !important; }
+            .card.cyan::before { background: #00838f !important; }
+            .card.pink::before { background: #ad1457 !important; }
+            .card.purple::before { background: #6a1b9a !important; }
+            .card.green::before { background: #1b5e20 !important; }
+
+            .card-label {
+                font-size: 10pt;
+                margin-bottom: 8px;
+            }
+            .card.cyan .card-label { color: #00695c !important; background: #e0f2f1 !important; }
+            .card.pink .card-label { color: #880e4f !important; background: #fce4ec !important; }
+            .card.purple .card-label { color: #4a148c !important; background: #f3e5f5 !important; }
+            .card.green .card-label { color: #1b5e20 !important; background: #e8f5e9 !important; }
+
+            .card h2 { color: #111; font-size: 20pt; margin-bottom: 10px; }
+            .card h3 { color: #222; font-size: 14pt; margin: 10px 0 6px; }
+            .card p, .card li { color: #333; font-size: 12pt; line-height: 1.4; }
+
+            .code-block {
+                background: #1e1e2e;
+                border: 2px solid #444;
+                color: #cdd6f4;
+                font-size: 10pt;
+                padding: 14px 18px;
+                margin: 8px 0;
+                line-height: 1.5;
+                border-radius: 8px;
+            }
+            .code-block .keyword { color: #f38ba8; }
+            .code-block .string { color: #a6e3a1; }
+            .code-block .comment { color: #6c7086; font-style: italic; }
+            .code-block .prop { color: #89dceb; }
+            .code-block .value { color: #cba6f7; }
+
+            .highlight-box {
+                font-size: 12pt;
+                padding: 10px 16px;
+                margin: 10px 0;
+                line-height: 1.4;
+            }
+            .highlight-box {
+                background: #fce4ec;
+                border-left: 4px solid #ad1457;
+            }
+            .highlight-box.green {
+                background: #e8f5e9;
+                border-left-color: #1b5e20;
+            }
+            .highlight-box.cyan {
+                background: #e0f2f1;
+                border-left-color: #00838f;
+            }
+            .highlight-box strong { color: #111; }
+
+            .two-col { gap: 14px; margin-bottom: 14px; }
+            .full-width { margin-bottom: 14px; }
+
+            .flow { margin: 12px 0; }
+            .flow-step {
+                background: #e0f2f1;
+                border: 2px solid #00838f;
+                padding: 10px 16px;
+                min-width: 100px;
+                border-radius: 10px;
+            }
+            .flow-step .step-num { color: #00695c; font-size: 24pt; }
+            .flow-step .step-label { font-size: 12pt; color: #222; }
+            .flow-arrow { color: #00838f; font-size: 20pt; }
+
+            .workflow-section { display: none !important; }
+            .techniques-section { display: none !important; }
+            .footer { display: none !important; }
+        }
+
+        @media (max-width: 900px) {
+            .two-col { grid-template-columns: 1fr; }
+            h1 { font-size: 2.5rem; }
+            .poster { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="poster">
+
+    <!-- ═══════════ HEADER ═══════════ -->
+    <div class="header">
+        <div class="badge">Prompt Engineering Showcase</div>
+        <h1>Behind the Prompt</h1>
+        <p class="subtitle">
+            Students answered six questions and walked away with their own playable 3D games.
+            This poster shows the instructions and guardrails that made that possible.
+        </p>
+    </div>
+
+    <!-- ═══════════ INTRO ═══════════ -->
+    <div class="intro-callout">
+        For this activity, students did not start with a blank screen. They answered a few questions,
+        and Copilot built a first playable version of the game. From there, they could test it,
+        react to it, and make it their own.
+    </div>
+
+    <!-- ═══════════ FLOW ═══════════ -->
+    <div class="card cyan full-width workflow-section">
+        <div class="card-label">⚡ Workflow</div>
+        <h2>How It Works — From Interview to Playable Game</h2>
+        <div class="flow">
+            <div class="flow-step">
+                <span class="step-num">1</span>
+                <span class="step-label">Interview<br>6 questions</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">
+                <span class="step-num">2</span>
+                <span class="step-label">Generate<br>the game</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">
+                <span class="step-num">3</span>
+                <span class="step-label">Update<br>manifest</span>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">
+                <span class="step-num">4</span>
+                <span class="step-label">Test &amp;<br>iterate</span>
+            </div>
+        </div>
+        <div class="highlight-box cyan">
+            To keep the process fast, Copilot only needs the game template and the manifest.
+            There is no setup step for students. Each game opens directly in the browser as a single HTML file.
+        </div>
+    </div>
+
+    <!-- ═══════════ SKILL OVERVIEW + INTERVIEW ═══════════ -->
+    <div class="two-col">
+
+        <!-- Skill: System Prompt -->
+        <div class="card pink">
+            <div class="card-label">📄 SKILL.MD — System Prompt</div>
+            <h2>The Instructions We Gave Copilot</h2>
+            <p>
+                We wrote a <strong>Copilot Custom Skill</strong> for this event. It is just a Markdown file,
+                but it gives Copilot a clear job: what to ask, what to build, and what rules to follow.
+                Ours lives at:
+            </p>
+            <div class="code-block">
+<span class="comment"># File location</span>
+<span class="string">.github/copilot/skills/build-my-game/SKILL.md</span>
+
+<span class="comment"># YAML frontmatter triggers the skill</span>
+<span class="keyword">---</span>
+<span class="prop">name</span>: <span class="value">build-my-game</span>
+<span class="prop">description</span>: <span class="string">"Create a custom Three.js video
+  game for NCWIT Indiana AIC Awards Event.
+  Trigger phrases: create my game,
+  make a game, build my game..."</span>
+<span class="keyword">---</span>
+            </div>
+            <p>
+                When a participant says <em>"build my game"</em>, Copilot loads these instructions and uses
+                them to guide the whole workflow from the interview to the finished game.
+            </p>
+            <div class="highlight-box">
+                <strong>Why it mattered:</strong> A simple phrase starts the workflow, but the instructions behind
+                it are detailed enough to keep the results consistent.
+            </div>
+        </div>
+
+        <!-- Interview Design -->
+        <div class="card cyan">
+            <div class="card-label">🎤 Step 1 — The Interview</div>
+            <h2>Prompt Strategy: Constrain the Input Space</h2>
+            <p>
+                The first prompt-engineering move was to reduce ambiguity before any code was written.
+                Instead of open-ended chat, the skill collects the important design choices in one
+                <strong>single dialog</strong>.
+            </p>
+
+            <div class="code-block">
+<span class="comment">## Step 1: Interview the Participant</span>
+Use the <span class="prop">vscode_askQuestions</span> tool to ask <span class="keyword">ALL</span> questions in a <span class="keyword">single call</span>:
+  <span class="value">1.</span> Your Name
+  <span class="value">2.</span> Game Genre
+  <span class="value">3.</span> Game Setting
+  <span class="value">4.</span> Color Theme
+  <span class="value">5.</span> Special Feature
+  <span class="value">6.</span> Game Title
+
+<span class="comment"># Ask for the title last, after gameplay and theme choices</span>
+            </div>
+
+            <div class="highlight-box cyan">
+                <strong>Prompt idea:</strong> ask for a small number of high-leverage choices up front.
+                That gives the model enough structure to generate something specific without inviting drift.
+            </div>
+
+            <div class="highlight-box">
+                <strong>Why this works:</strong> most choices are bounded, but the title stays open-ended.
+                The prompt narrows the design space without making every game feel the same.
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ GENERATION RULES + VISUALS ═══════════ -->
+    <div class="two-col">
+
+        <!-- Generation Rules -->
+        <div class="card purple">
+            <div class="card-label">🏗️ Step 2 — Code Generation Rules</div>
+            <h2>Prompt Strategy: Make the Output Legible and Bounded</h2>
+
+            <p>
+                Once the inputs are structured, the next prompt-engineering job is to keep the output from
+                becoming bloated, generic, or fragile. These constraints are not just technical rules.
+                They are there to shape the kind of code the model produces.
+            </p>
+
+            <div class="code-block">
+<span class="comment">## Step 2: Generate the Game</span>
+- Create <span class="string">games/&lt;name&gt;/index.html</span>
+- Single-file HTML with inline Three.js
+- Compound 3D models (<span class="keyword">no generic shapes!</span>)
+- Keyboard + touch controls
+- Title screen, score, game-over, play-again
+
+<span class="comment">## Important Rules</span>
+- <span class="keyword">NEVER</span> require npm, node, or any build tools
+- <span class="keyword">NEVER</span> create external JS/CSS files
+- <span class="keyword">ALWAYS</span> use Three.js r128 from CDN
+            </div>
+
+            <div class="code-block">
+<span class="comment"># Keep the output portable</span>
+- Must work when opened directly in a browser
+- No external JS or CSS files
+- No npm, no Node.js, no build tools
+
+<span class="comment"># Require a complete playable loop</span>
+- Title screen with name, instructions, and "Press SPACE or Tap"
+- Score display via HTML overlay
+- Game-over screen with final score + Play Again
+- Responsive design on desktop and mobile
+
+<span class="comment"># Prevent common breakages</span>
+- Web Audio API only; no external sound files
+- Resume AudioContext on first user gesture
+- Keyboard controls AND mobile touch controls
+            </div>
+
+            <div class="highlight-box">
+                <strong>Prompt idea:</strong> good constraints do double duty. They simplify the student experience,
+                and they also stop the model from wandering into package setup, multi-file sprawl, or broken browser behavior.
+            </div>
+        </div>
+
+        <!-- Visual Theming -->
+        <div class="card green">
+            <div class="card-label">🎨 Visual Theming Instructions</div>
+            <h2>No Generic Cubes Allowed</h2>
+            <p>
+                We did not want every game to look like a quick demo. So the instructions explicitly push
+                Copilot to <strong>build compound 3D models</strong> from multiple primitives instead of relying
+                on default cubes and spheres.
+            </p>
+
+            <div class="code-block">
+<span class="comment">// Example from the prompt: build a spaceship</span>
+<span class="keyword">function</span> <span class="prop">createSpaceship</span>() {
+    <span class="keyword">const</span> group = <span class="keyword">new</span> THREE.Group();
+
+    <span class="comment">// Body</span>
+    <span class="keyword">const</span> body = <span class="keyword">new</span> THREE.Mesh(
+        <span class="keyword">new</span> THREE.<span class="prop">CylinderGeometry</span>(<span class="value">0.3, 0.4, 1.2, 8</span>),
+        material
+    );
+    group.add(body);
+
+    <span class="comment">// Nose cone</span>
+    <span class="keyword">const</span> nose = <span class="keyword">new</span> THREE.Mesh(
+        <span class="keyword">new</span> THREE.<span class="prop">ConeGeometry</span>(<span class="value">0.3, 0.5, 8</span>),
+        material
+    );
+    nose.position.y = <span class="value">0.85</span>;
+    group.add(nose);
+
+    <span class="comment">// Wings</span>
+    <span class="keyword">const</span> wing = <span class="keyword">new</span> THREE.Mesh(
+        <span class="keyword">new</span> THREE.<span class="prop">BoxGeometry</span>(<span class="value">1.8, 0.05, 0.4</span>),
+        material
+    );
+    group.add(wing);
+
+    <span class="keyword">return</span> group;
+}
+            </div>
+
+            <div class="code-block">
+<span class="comment"># Setting-specific visual recipes from the prompt</span>
+- <span class="prop">Underwater</span>: Fish = sphere body + cone tail + triangle fins
+- <span class="prop">Medieval Fantasy</span>: Knight = box body + sphere head + cone helmet + thin box sword
+- <span class="prop">Candy Land</span>: Gummy bear = sphere body + small sphere ears + cylinder limbs
+- <span class="prop">Cyberpunk City</span>: Hover-bike = flat box + cylinder engines + emissive glow
+- <span class="prop">Haunted</span>: Ghost = sphere + taper + semi-transparent material
+
+<span class="comment"># Rule of thumb</span>
+Use at least <span class="value">3-4 primitives per character</span> so the visuals feel designed, not autogenerated.
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ MEMORY + FAST-PATH ═══════════ -->
+    <div class="card pink full-width">
+            <div class="card-label">🧠 Repository Memory</div>
+            <h2>What We Learned Along the Way</h2>
+            <p>
+                Copilot also has a <strong>persistent memory system</strong> for this repository.
+                As we tested the activity, we saved lessons that did not belong in the main skill file:
+            </p>
+
+            <div class="code-block">
+<span class="comment"># Fast-path behavior saved in repository memory</span>
+- <span class="string">/build-my-game</span> must begin with a single <span class="prop">vscode_askQuestions</span> call before any other action.
+- Ask <span class="keyword">ALL</span> questions in <span class="keyword">ONE</span> call, in this exact order and wording.
+- Minimal required files after interview: <span class="string">games/_template/index.html</span> and <span class="string">games/manifest.js</span>.
+- Avoid reading <span class="string">README.md</span>, <span class="string">index.html</span>, and <span class="string">styles.css</span>.
+
+<span class="comment"># Game design rules learned from mistakes</span>
+- Do <span class="keyword">NOT</span> default to runner/side-scroller mechanics.
+- Each game must be conceptually unique.
+- Every game must display instructions on the title screen.
+- Every game must support both keyboard controls and on-screen touch controls.
+
+<span class="comment"># File-format corrections</span>
+- The manifest is <span class="string">games/manifest.js</span> (<span class="keyword">NOT</span> .json).
+- <span class="string">index.html</span> loads manifest.js via <span class="string">&lt;script&gt;</span> (no fetch; works with <span class="string">file://</span> protocol).
+            </div>
+
+            <div class="highlight-box green">
+                <strong>How memory helped:</strong> When we saw the same mistake twice, we saved the fix.
+                That meant the next student started from a better version of the workflow.
+            </div>
+    </div>
+
+    <!-- ═══════════ PROMPT ENGINEERING TECHNIQUES ═══════════ -->
+    <div class="card purple full-width techniques-section">
+        <div class="card-label">🔬 Techniques</div>
+        <h2>Design Choices That Helped</h2>
+
+        <div class="two-col" style="margin-bottom: 0;">
+            <div>
+                <h3>1. Structured Choices → Consistent Output</h3>
+                <p>
+                    We used predefined genre, setting, and color choices instead of relying entirely on free text.
+                    That made it easier to map each student choice to clear visual and gameplay instructions.
+                </p>
+
+                <h3>2. Negative Instructions</h3>
+                <p>
+                    Some of the most useful instructions were about what to avoid: generic shapes,
+                    unnecessary setup, and repetitive runner-style mechanics.
+                </p>
+
+                <h3>3. Concrete Examples</h3>
+                <p>
+                    Instead of saying "make it interesting," we included small concrete examples.
+                    That gave Copilot something specific to adapt.
+                </p>
+            </div>
+            <div>
+                <h3>4. Fast-Path Optimization</h3>
+                <p>
+                    Early versions spent too much time looking around the repo before doing useful work.
+                    Once we told Copilot to start the interview immediately and only read two files,
+                    the process sped up.
+                </p>
+
+                <h3>5. Memory as Iteration</h3>
+                <p>
+                    Repository memory let us improve the workflow without rewriting the whole skill.
+                    When something went wrong, we saved the lesson and used it next time.
+                </p>
+
+                <h3>6. Single-File Constraint</h3>
+                <p>
+                    Requiring a single HTML file was not just a convenience choice. It also kept the output
+                    from getting overly complex. Students could open the game and keep working.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ FOOTER ═══════════ -->
+    <div class="footer">
+        <p>NCWIT Indiana AIC Awards Event &bull; Built with GitHub Copilot, simple web tools, and a lot of student choice</p>
+        <div class="tech-stack">
+            <span class="tech-badge">Three.js r128</span>
+            <span class="tech-badge">GitHub Copilot</span>
+            <span class="tech-badge">VS Code Skills</span>
+            <span class="tech-badge">Web Audio API</span>
+            <span class="tech-badge">Zero Dependencies</span>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

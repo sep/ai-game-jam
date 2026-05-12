@@ -23,6 +23,7 @@ Repo fast-path reference: see .github/copilot/skills/build-my-game/build-my-game
 Use the `vscode_askQuestions` tool to ask ALL of the following questions in a single call:
 
 - For questions with predefined choices, provide those choices in the tool `options` field so participants can click to select.
+- For each option, include the `description` field so participants can see what each choice means before selecting.
 - Do not rely on inline suggestion text alone for choice-based questions.
 
 **Questions to ask:**
@@ -97,12 +98,12 @@ After receiving answers, create the game:
    - Do not modify the root arcade files (`index.html` or `styles.css`) as part of normal game generation or customization
    - Must include:
      - A `<canvas>` with Three.js renderer
-     - Keyboard controls (show control instructions on screen)
+     - Keyboard controls (show control instructions on screen) AND mobile touch controls (on-screen buttons, auto-shown on touch devices via `@media (pointer: coarse)`)
      - Score display using HTML overlay (not Three.js text)
      - Game-over screen with final score and "Play Again" button
-     - Title screen with the game name and "Press SPACE to Start"
+     - Title screen with the game name, game instructions (controls and objective), and "Press SPACE or Tap to Start"
      - The participant's name in a small credit line
-     - Responsive design (fills the browser window)
+     - Responsive design (fills the browser window, works on mobile and desktop)
    - Use the template at `games/_template/index.html` as a reference for game structure and patterns, but customize heavily based on their choices
 
 3. **Use their color theme** throughout — background, player, obstacles, UI text, particles
@@ -166,15 +167,15 @@ After receiving answers, create the game:
 
 ## Step 3: Update the Manifest
 
-After creating the game file, update `games/manifest.json`:
+After creating the game file, update `games/manifest.js`:
 - Read the current manifest file
-- Add a new entry to the JSON array:
-```json
+- Add a new entry to the `GAMES` array:
+```js
 {
-  "name": "<Their Name>",
   "title": "<Game Title>",
+  "author": "<Their Name>",
+  "path": "games/<folder-name>/index.html",
   "genre": "<Genre>",
-  "folder": "<folder-name>",
   "color": "<color theme>"
 }
 ```
