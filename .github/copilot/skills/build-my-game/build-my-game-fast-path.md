@@ -5,14 +5,14 @@ Use this as the operational fast path for /build-my-game runs.
 - Start with vscode_askQuestions immediately.
 - Ask the first question exactly as: What is your name?
 - Use a single vscode_askQuestions call for the interview.
-- Ask ALL of the following questions in a single vscode_askQuestions call, in this exact order and wording (verbatim). Use the option lists from SKILL.md § "Step 1: Interview the Participant" for each question's choices.
-- **Every option must include a `description` field** so participants can see what each choice means before selecting. Copy the descriptions exactly from SKILL.md.
+- Ask ALL of the following questions in a single vscode_askQuestions call, in this exact order and wording (verbatim). **SKILL.md has been deleted** — inline all option lists and descriptions directly in the vscode_askQuestions call.
+- **Every option must include a `description` field** so participants can see what each choice means before selecting. Descriptions must be inlined directly (do not reference SKILL.md).
 
   1. **Your Name** — "What's your name? (This will be used for your game's folder and credits)"
-  2. **Game Genre** — "Pick a game type!" (options + descriptions from SKILL.md, including Mario Platformer)
-  3. **Game Setting** — "What world does your game live in?" (options + descriptions from SKILL.md)
-  4. **Color Theme** — "Pick a vibe!" (options + descriptions from SKILL.md)
-  5. **Special Feature** — "Want to add a twist? Pick one or describe your own!" (options + descriptions from SKILL.md)
+  2. **Game Genre** — "Pick a game type!" (options + descriptions inlined; SKILL.md deleted)
+  3. **Game Setting** — "What world does your game live in?" (options + descriptions inlined; SKILL.md deleted)
+  4. **Color Theme** — "Pick a vibe!" (options + descriptions inlined; SKILL.md deleted)
+  5. **Special Feature** — "Want to add a twist? Pick one or describe your own!" (options + descriptions inlined; SKILL.md deleted)
   6. **Game Title** — "Now that you know what your game is about, what do you want to call it?"
 
 - Ask for the game title last, after gameplay and theme questions.
@@ -22,7 +22,7 @@ Use this as the operational fast path for /build-my-game runs.
 - Minimal required files after interview: games/_template/index.html and games/manifest.js.
 - **Before generating any game code**, read `.github/copilot/skills/build-my-game/known-issues.md` and follow every rule. This is a living file — new lessons get added whenever a participant reports a fundamental bug.
 - When a participant reports a fundamental issue (e.g., can't start on mobile, view blocked, unreachable area, no audio), **append the lesson** to `known-issues.md` under the right category before fixing the game.
-- Fast-path file references SKILL.md for option lists — do not duplicate them.
+- **SKILL.md has been deleted** — do not reference it. All question options and descriptions must be inlined directly in the vscode_askQuestions call.
 - **To avoid response length / rate limits**: always split game generation across two turns — (1) generate and write the game file, then (2) update manifest + open browser in the next response.
 - Avoid reading README.md, index.html, and styles.css unless the user asks to change the arcade site or docs.
 - New participant games live at games/<filesystem-safe-name>/index.html.
