@@ -1,5 +1,12 @@
 const GAMES = [
   {
+    "title": "Coding Princess",
+    "author": "coding princess",
+    "path": "games/coding-princess/index.html",
+    "genre": "Survival Arena",
+    "color": "Sunset"
+  },
+  {
     "title": "Space Brick Buster",
     "author": "Nicole Selig",
     "path": "games/nicole/index.html",

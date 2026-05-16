@@ -30,7 +30,7 @@ fundamental issue, add it here so future games avoid the same mistake.
 - **Tall decorative geometry** (buildings, trees, mountains) should be pushed
   behind or beside the gameplay area, never in front of or overlapping it.
 
-## Gameplay
+## Gameplay 
 
 - **Side-scrollers and runners on "Platformer" genre.** Do NOT default to
   auto-scrolling runner mechanics when the participant picks Platformer. Use
@@ -44,6 +44,10 @@ fundamental issue, add it here so future games avoid the same mistake.
 ## Physics
 
 - **Pigs (and other destructible objects) must have gravity applied.** Static mesh positions don't respond to block removal. Give each pig a `velY` field, apply gravity each frame, check support from the ground and from surviving blocks, and let pigs fall and die when unsupported. Without this, hitting a block under a pig has no visible effect.
+
+## Three.js Compatibility
+
+- **Use only geometries available in the pinned Three.js CDN version (`r128`).** Avoid constructors that may not exist in this build (for example `THREE.CapsuleGeometry` in some environments). A runtime constructor error stops script execution before input listeners are attached, which looks like "Press SPACE or Tap to Start" is broken.
 
 ## Slingshot / Launcher Mechanics
 
