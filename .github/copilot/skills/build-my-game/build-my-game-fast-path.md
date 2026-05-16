@@ -5,13 +5,14 @@ Use this as the operational fast path for /build-my-game runs.
 - Start with vscode_askQuestions immediately.
 - Ask the first question exactly as: What is your name?
 - Use a single vscode_askQuestions call for the interview.
-- Ask ALL of the following questions in a single vscode_askQuestions call, in this exact order and wording (verbatim). Use the option lists from SKILL.md § "Step 1: Interview the Participant" for each question's choices:
+- Ask ALL of the following questions in a single vscode_askQuestions call, in this exact order and wording (verbatim). Use the option lists from SKILL.md § "Step 1: Interview the Participant" for each question's choices.
+- **Every option must include a `description` field** so participants can see what each choice means before selecting. Copy the descriptions exactly from SKILL.md.
 
   1. **Your Name** — "What's your name? (This will be used for your game's folder and credits)"
-  2. **Game Genre** — "Pick a game type!" (options from SKILL.md)
-  3. **Game Setting** — "What world does your game live in?" (options from SKILL.md)
-  4. **Color Theme** — "Pick a vibe!" (options from SKILL.md)
-  5. **Special Feature** — "Want to add a twist? Pick one or describe your own!" (options from SKILL.md)
+  2. **Game Genre** — "Pick a game type!" (options + descriptions from SKILL.md)
+  3. **Game Setting** — "What world does your game live in?" (options + descriptions from SKILL.md)
+  4. **Color Theme** — "Pick a vibe!" (options + descriptions from SKILL.md)
+  5. **Special Feature** — "Want to add a twist? Pick one or describe your own!" (options + descriptions from SKILL.md)
   6. **Game Title** — "Now that you know what your game is about, what do you want to call it?"
 
 - Ask for the game title last, after gameplay and theme questions.

@@ -41,6 +41,15 @@ fundamental issue, add it here so future games avoid the same mistake.
 - **Instant death on spawn.** Never place hazards or enemies at or near the
   player's spawn point. Leave a safe zone of at least 3 units around spawn.
 
+## Physics
+
+- **Pigs (and other destructible objects) must have gravity applied.** Static mesh positions don't respond to block removal. Give each pig a `velY` field, apply gravity each frame, check support from the ground and from surviving blocks, and let pigs fall and die when unsupported. Without this, hitting a block under a pig has no visible effect.
+
+## Slingshot / Launcher Mechanics
+
+- **Bird drag must be clamped to pull-back direction only.** In a slingshot game the bird rests at the fork position. Dragging RIGHT on screen moves the bird toward the targets (wrong). Fix: clamp `newX` to `≤ SLING_POS.x` so the bird can only be pulled left/back. The launch velocity `(rest - pull)` is then always positive (toward the targets).
+- **A rubber-band visual is required.** Without visible bands connecting the fork tips to the bird, users have no feedback that dragging is working. Add two `THREE.Line` objects that update their endpoints to `bird.position` each frame, hidden while the bird is in flight.
+
 ## Audio
 
 - **AudioContext must be resumed on first user gesture** (`if (audioCtx.state

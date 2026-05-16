@@ -62,5 +62,19 @@ const GAMES = [
     "path": "games/coolest/index.html",
     "genre": "Platformer",
     "color": "neon-cyber"
+  },
+  {
+    "title": "Icy Angry Birds",
+    "author": "Nicole",
+    "path": "games/nicole/index.html",
+    "genre": "Angry Birds",
+    "color": "ocean"
+  },
+  {
+    "title": "Portal Angry Birds",
+    "author": "test1",
+    "path": "games/test1/index.html",
+    "genre": "Angry Birds",
+    "color": "forest"
   }
 ];
