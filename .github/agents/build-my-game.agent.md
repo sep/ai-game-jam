@@ -44,6 +44,7 @@ Use the `vscode_askQuestions` tool to ask ALL of the following questions in a si
    - `Rhythm Runner` (description: "Notes fall toward you — press the right key at the right time!")
    - `Survival Arena` (description: "Waves of enemies close in — survive as long as you can!")
    - `Platformer` (description: "Jump between floating 3D platforms — don't fall!")
+   - `Angry Birds` (description: "Pull back a slingshot and launch birds at pig structures — knock them all down!")
 
 3. **Game Setting** — "What world does your game live in?" with options:
    - `Outer Space` (description: "Stars, planets, and spaceships — pew pew!")
@@ -156,6 +157,7 @@ After receiving answers, create the game:
    - **Rhythm Runner**: 3-4 lanes, notes (colored blocks) scroll toward a hit zone, press matching key (A/S/D/F or arrow keys) when note reaches the zone, score based on timing accuracy
    - **Survival Arena**: Player in center of arena, enemies spawn from edges in waves, WASD to move + mouse or arrow keys to shoot, survive as many waves as possible
    - **Platformer**: Side-view camera, platforms float at different heights, arrow keys to move + space to jump, falling off = game over, collect items for score
+   - **Angry Birds**: Slingshot on the left, pig structures on the right; click+drag bird left to pull back (clamp X ≤ slingshot rest position), release to launch; gravity on bird and on pigs (pigs fall when blocks beneath them are destroyed); portals or power-ups optional; win when all pigs are eliminated, lose when birds run out; rubber-band visual connecting fork tips to bird while aiming
 
 6. **Add their special feature** as described
 
