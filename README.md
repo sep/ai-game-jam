@@ -81,3 +81,5 @@ After your game is generated, try asking Copilot:
 - **Vanilla HTML/JS** — no build tools, no npm
 - **GitHub Pages** — free static hosting
 - **GitHub Copilot** — agentic AI coding assistant
+
+
