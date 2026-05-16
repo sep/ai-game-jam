@@ -1,7 +1,7 @@
 ---
 name: "Build My Game"
 description: "Create a custom Three.js video game for NCWIT Indiana AIC Awards Event. Use when a participant wants to make their game. Trigger phrases: create my game, make a game, build my game, start my game, help me make a game."
-tools: [read, edit, search, execute, todo]
+tools: [read, edit, search, execute, todo, vscode_askQuestions]
 argument-hint: "Tell me your name and what kind of game you want to build!"
 ---
 
