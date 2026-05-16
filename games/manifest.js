@@ -12,5 +12,12 @@ const GAMES = [
     "path": "games/thanishka/index.html",
     "genre": "Maze Runner",
     "color": "Sunset"
+  },
+  {
+    "title": "CyberDodge",
+    "author": "Zoey Trusty",
+    "path": "games/zoey-trusty/index.html",
+    "genre": "Endless Runner",
+    "color": "Neon Cyber"
   }
 ];
