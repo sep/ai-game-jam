@@ -9,7 +9,7 @@ Use this as the operational fast path for /build-my-game runs.
 - **Every option must include a `description` field** so participants can see what each choice means before selecting. Copy the descriptions exactly from SKILL.md.
 
   1. **Your Name** — "What's your name? (This will be used for your game's folder and credits)"
-  2. **Game Genre** — "Pick a game type!" (options + descriptions from SKILL.md)
+  2. **Game Genre** — "Pick a game type!" (options + descriptions from SKILL.md, including Mario Platformer)
   3. **Game Setting** — "What world does your game live in?" (options + descriptions from SKILL.md)
   4. **Color Theme** — "Pick a vibe!" (options + descriptions from SKILL.md)
   5. **Special Feature** — "Want to add a twist? Pick one or describe your own!" (options + descriptions from SKILL.md)
@@ -23,6 +23,7 @@ Use this as the operational fast path for /build-my-game runs.
 - **Before generating any game code**, read `.github/copilot/skills/build-my-game/known-issues.md` and follow every rule. This is a living file — new lessons get added whenever a participant reports a fundamental bug.
 - When a participant reports a fundamental issue (e.g., can't start on mobile, view blocked, unreachable area, no audio), **append the lesson** to `known-issues.md` under the right category before fixing the game.
 - Fast-path file references SKILL.md for option lists — do not duplicate them.
+- **To avoid response length / rate limits**: always split game generation across two turns — (1) generate and write the game file, then (2) update manifest + open browser in the next response.
 - Avoid reading README.md, index.html, and styles.css unless the user asks to change the arcade site or docs.
 - New participant games live at games/<filesystem-safe-name>/index.html.
 - Games are single-file HTML with inline JS/CSS and Three.js r128 from CDN.

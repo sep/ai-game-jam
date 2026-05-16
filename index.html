@@ -48,7 +48,9 @@
             'Asteroid Field': '☄️',
             'Rhythm Runner': '🎵',
             'Survival Arena': '⚔️',
-            'Platformer': '🦘'
+            'Platformer': '🦘',
+            'Angry Birds': '🐦',
+            'Mario Platformer': '🍄'
         };
 
         const THEME_COLORS = {
@@ -58,6 +60,7 @@
             'Forest': ['#228b22', '#8b4513', '#ffd700'],
             'Monochrome': ['#fff', '#888', '#333']
         };
+
 
         function escapeHtml(text) {
             const div = document.createElement('div');
@@ -77,18 +80,24 @@
 
             grid.innerHTML = GAMES.map(game => {
                 const emoji = GENRE_EMOJI[game.genre] || '🎮';
-                const colors = THEME_COLORS[game.color] || ['#6c5ce7', '#a29bfe', '#dfe6e9'];
+                const colors = ['#6c5ce7', '#a29bfe', '#dfe6e9'];
                 const gradient = `linear-gradient(135deg, ${colors[0]}22, ${colors[1]}22)`;
                 const borderColor = colors[0];
 
+                const codeUrl = 'https://github.com/sep/ncwit-arcade/blob/main/' + game.path;
+
                 return `
-                    <a href="${escapeHtml(game.path)}" class="game-card" style="background: ${gradient}; border-color: ${borderColor}">
+                    <div class="game-card" style="background: ${gradient}; border-color: ${borderColor}">
                         <div class="game-emoji">${emoji}</div>
                         <h2 class="game-title">${escapeHtml(game.title)}</h2>
                         <p class="game-creator">by ${escapeHtml(game.author)}</p>
                         <span class="game-genre" style="background: ${borderColor}33; color: ${borderColor}">${escapeHtml(game.genre || 'Game')}</span>
-                        <div class="play-button" style="background: ${borderColor}">▶ Play</div>
-                    </a>
+                        ${game.description ? `<p class="game-description">${escapeHtml(game.description)}</p>` : ''}
+                        <div class="card-footer">
+                            <a href="${escapeHtml(game.path)}" class="play-button" style="background: ${borderColor}">▶ Play</a>
+                            <a href="${escapeHtml(codeUrl)}" class="code-link" target="_blank" rel="noopener">&lt;/&gt; Code</a>
+                        </div>
+                    </div>
                 `;
             }).join('');
         }
