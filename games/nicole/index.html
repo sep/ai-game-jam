@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Brick Buster</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; background: #050510; font-family: 'Segoe UI', system-ui, sans-serif; }
+        canvas { display: block; }
+
+        #ui {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; z-index: 10;
+        }
+        #score {
+            position: absolute; top: 20px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.8rem; color: #0ff; font-weight: 700;
+            text-shadow: 0 0 12px #0ff;
+        }
+        #lives {
+            position: absolute; top: 20px; left: 20px;
+            font-size: 1.5rem; color: #f0f;
+            text-shadow: 0 0 10px #f0f;
+        }
+        #powerup-status {
+            position: absolute; top: 58px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 1rem; color: #ff0;
+            text-shadow: 0 0 8px #ff0; min-height: 1.4rem;
+        }
+        #controls-hint {
+            position: absolute; bottom: 20px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.85rem; color: #555;
+        }
+
+        .screen {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            background: rgba(5, 5, 16, 0.93);
+            z-index: 20; pointer-events: auto;
+        }
+        .screen h1 {
+            font-size: clamp(2rem, 8vw, 3.8rem);
+            color: #0ff;
+            text-shadow: 0 0 20px #0ff, 0 0 40px #0ff;
+            margin-bottom: 0.4rem; letter-spacing: 3px;
+        }
+        .screen .sub { font-size: 1.1rem; color: #888; margin-bottom: 0.2rem; }
+        .screen .instructions { font-size: 0.95rem; color: #aaa; margin: 0.15rem 0; text-align: center; padding: 0 1rem; }
+        .screen .start-text {
+            font-size: 1.3rem; color: #f0f; margin-top: 1.5rem;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        .screen .final-score { font-size: 2rem; color: #0ff; margin-bottom: 1.5rem; }
+        .screen button {
+            padding: 0.8rem 2.5rem; font-size: 1.1rem;
+            border: 2px solid #0ff; background: transparent; color: #0ff;
+            border-radius: 8px; cursor: pointer; transition: background 0.2s;
+            pointer-events: auto; min-height: 44px;
+        }
+        .screen button:hover, .screen button:active { background: rgba(0,255,255,0.15); }
+        .credit { position: absolute; bottom: 18px; font-size: 0.8rem; color: #444; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        .hidden { display: none !important; }
+
+        /* Mobile touch controls */
+        #mobile-controls {
+            display: none;
+            position: fixed; bottom: 20px; left: 0;
+            width: 100%; height: 100px; z-index: 15;
+            pointer-events: auto;
+            justify-content: space-between; padding: 0 20px;
+            align-items: center;
+        }
+        .touch-btn {
+            width: 90px; height: 90px; border-radius: 50%;
+            border: 2px solid rgba(0,255,255,0.4);
+            background: rgba(0,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; color: rgba(0,255,255,0.7);
+            user-select: none; -webkit-user-select: none;
+        }
+        .touch-btn:active, .touch-btn.pressed {
+            background: rgba(0,255,255,0.25);
+            border-color: rgba(0,255,255,0.8);
+        }
+        @media (pointer: coarse) {
+            #mobile-controls { display: flex; }
+            #controls-hint { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="ui">
+    <div id="lives">♥ ♥ ♥</div>
+    <div id="score">SCORE: 0</div>
+    <div id="powerup-status"></div>
+    <div id="controls-hint">← → or A/D to move &nbsp;|&nbsp; SPACE to launch ball</div>
+</div>
+
+<div id="mobile-controls">
+    <div class="touch-btn" id="btn-left">◀</div>
+    <div class="touch-btn" id="btn-right">▶</div>
+</div>
+
+<!-- Title Screen -->
+<div id="title-screen" class="screen">
+    <h1>test</h1>
+    <p class="sub">Neon Space Brick Breaker</p>
+    <p class="instructions">Move your spaceship with ← → or A/D keys</p>
+    <p class="instructions">Press SPACE (or tap) to launch your energy ball</p>
+    <p class="instructions">Catch falling gems for power-ups: wide paddle, slow-mo, shield &amp; multi-ball!</p>
+    <p class="instructions">Destroy all the neon bricks to win!</p>
+    <p class="start-text">Press SPACE or Tap to Start</p>
+    <p class="credit">By name &mdash; NCWIT Indiana AIC Awards 2026</p>
+</div>
+
+<!-- Game Over Screen -->
+<div id="gameover-screen" class="screen hidden">
+    <h1>GAME OVER</h1>
+    <p class="final-score" id="final-score">Score: 0</p>
+    <button id="restart-btn">Play Again</button>
+    <p class="credit">By name &mdash; NCWIT Indiana AIC Awards 2026</p>
+</div>
+
+<!-- Win Screen -->
+<div id="win-screen" class="screen hidden">
+    <h1 style="color:#0f0;text-shadow:0 0 20px #0f0,0 0 40px #0f0">YOU WIN! 🚀</h1>
+    <p class="final-score" id="win-score" style="color:#0f0">Score: 0</p>
+    <button id="win-restart-btn" style="border-color:#0f0;color:#0f0;">Play Again</button>
+    <p class="credit">By name &mdash; NCWIT Indiana AIC Awards 2026</p>
+</div>
+
+<script>
+// =====================================================
+// RENDERER & SCENE
+// =====================================================
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x050510);
+scene.fog = new THREE.FogExp2(0x050510, 0.012);
+
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
+camera.position.set(0, 0, 22);
+camera.lookAt(0, 0, 0);
+
+// =====================================================
+// AUDIO
+// =====================================================
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playTone(freq, type, dur, vol = 0.25) {
+    if (audioCtx.state === 'suspended') return;
+    try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(Math.max(20, freq * 0.5), audioCtx.currentTime + dur);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur);
+    } catch(e) {}
+}
+
+let bgMusicRunning = false;
+function startBgMusic() {
+    if (bgMusicRunning) return;
+    bgMusicRunning = true;
+    // Upbeat melody loop
+    const melody = [523.25, 659.25, 783.99, 659.25, 523.25, 392.00, 440.00, 523.25,
+                    587.33, 739.99, 880.00, 739.99, 587.33, 523.25, 493.88, 440.00];
+    let idx = 0;
+    function nextNote() {
+        if (!bgMusicRunning) return;
+        if (audioCtx.state === 'suspended') { setTimeout(nextNote, 300); return; }
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.value = melody[idx % melody.length] * 0.5;
+            gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.38);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.38);
+        } catch(e) {}
+        idx++;
+        setTimeout(nextNote, 350);
+    }
+    nextNote();
+}
+
+// =====================================================
+// STAR FIELD
+// =====================================================
+(function buildStars() {
+    const geo = new THREE.BufferGeometry();
+    const pos = [];
+    for (let i = 0; i < 2500; i++) {
+        pos.push(
+            (Math.random() - 0.5) * 200,
+            (Math.random() - 0.5) * 150,
+            Math.random() * -80 - 5
+        );
+    }
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    scene.add(new THREE.Points(geo,
+        new THREE.PointsMaterial({ color: 0xffffff, size: 0.18, transparent: true, opacity: 0.85 })));
+})();
+
+// Distant planet
+const planet = new THREE.Mesh(
+    new THREE.SphereGeometry(4, 32, 32),
+    new THREE.MeshStandardMaterial({ color: 0x1a0535, emissive: 0x0a0220, roughness: 0.9 })
+);
+planet.position.set(14, 9, -25);
+scene.add(planet);
+const planetRing = new THREE.Mesh(
+    new THREE.TorusGeometry(6.5, 0.5, 4, 48),
+    new THREE.MeshStandardMaterial({ color: 0x5500cc, emissive: 0x2200aa, roughness: 0.4 })
+);
+planetRing.rotation.x = Math.PI / 3.5;
+planetRing.position.copy(planet.position);
+scene.add(planetRing);
+
+// Nebula glow cloud
+const nebulaGeo = new THREE.SphereGeometry(8, 8, 8);
+const nebulaMat = new THREE.MeshStandardMaterial({ color: 0x001144, emissive: 0x000844, transparent: true, opacity: 0.18 });
+const nebula = new THREE.Mesh(nebulaGeo, nebulaMat);
+nebula.position.set(-10, 5, -18);
+scene.add(nebula);
+
+// =====================================================
+// LIGHTING
+// =====================================================
+scene.add(new THREE.AmbientLight(0x111133, 0.6));
+const dirLight = new THREE.DirectionalLight(0x4488ff, 0.8);
+dirLight.position.set(5, 10, 10);
+scene.add(dirLight);
+const pointLight = new THREE.PointLight(0x00ffff, 1.8, 35);
+pointLight.position.set(0, 2, 8);
+scene.add(pointLight);
+const pinkLight = new THREE.PointLight(0xff00ff, 0.8, 25);
+pinkLight.position.set(-8, -5, 5);
+scene.add(pinkLight);
+
+// =====================================================
+// CONSTANTS
+// =====================================================
+const PLAY_W      = 8;    // half-width of play area
+const PLAY_H      = 11;   // half-height of play area
+const PADDLE_Y    = -9.2;
+const BRICK_ROWS  = 5;
+const BRICK_COLS  = 8;
+const BRICK_W     = 1.65;
+const BRICK_H     = 0.65;
+const BRICK_GAP_X = 0.22;
+const BRICK_GAP_Y = 0.28;
+const BALL_SPEED  = 0.19;
+
+// =====================================================
+// WALL VISUALS
+// =====================================================
+const wallMat = new THREE.MeshStandardMaterial({ color: 0x0033bb, emissive: 0x001166, emissiveIntensity: 0.5, transparent: true, opacity: 0.45 });
+const leftWallMesh  = new THREE.Mesh(new THREE.BoxGeometry(0.25, PLAY_H * 2.5, 0.35), wallMat);
+leftWallMesh.position.set(-PLAY_W - 0.15, 0, 0); scene.add(leftWallMesh);
+const rightWallMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, PLAY_H * 2.5, 0.35), wallMat);
+rightWallMesh.position.set(PLAY_W + 0.15, 0, 0); scene.add(rightWallMesh);
+const topWallMesh   = new THREE.Mesh(new THREE.BoxGeometry(PLAY_W * 2.5, 0.25, 0.35), wallMat);
+topWallMesh.position.set(0, PLAY_H, 0); scene.add(topWallMesh);
+
+// =====================================================
+// PADDLE (Spaceship)
+// =====================================================
+function createPaddle() {
+    const g = new THREE.Group();
+    // Hull
+    const hull = new THREE.Mesh(
+        new THREE.BoxGeometry(3.6, 0.45, 0.75),
+        new THREE.MeshStandardMaterial({ color: 0x0044cc, emissive: 0x0022ee, emissiveIntensity: 0.4, metalness: 0.7, roughness: 0.3 })
+    );
+    g.add(hull);
+    // Cockpit dome
+    const dome = new THREE.Mesh(
+        new THREE.SphereGeometry(0.32, 14, 10),
+        new THREE.MeshStandardMaterial({ color: 0x00ffff, emissive: 0x00ffff, emissiveIntensity: 0.7, transparent: true, opacity: 0.85 })
+    );
+    dome.position.set(0, 0.33, 0);
+    g.add(dome);
+    // Left wing
+    const wMat = new THREE.MeshStandardMaterial({ color: 0x0055dd, emissive: 0x0033ff, emissiveIntensity: 0.3, metalness: 0.6 });
+    const wL = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.1, 0.55), wMat);
+    wL.position.set(-2.35, 0.05, 0.1); wL.rotation.z = 0.18; g.add(wL);
+    const wR = wL.clone(); wR.position.set(2.35, 0.05, 0.1); wR.rotation.z = -0.18; g.add(wR);
+    // Engine nozzles
+    const eMat = new THREE.MeshStandardMaterial({ color: 0xff4400, emissive: 0xff6600, emissiveIntensity: 1.2 });
+    const eL = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.24, 0.38, 8), eMat);
+    eL.rotation.z = Math.PI / 2; eL.position.set(-1.6, -0.18, 0); g.add(eL);
+    const eR = eL.clone(); eR.position.set(1.6, -0.18, 0); g.add(eR);
+    return g;
+}
+
+let paddle = createPaddle();
+paddle.position.set(0, PADDLE_Y, 0);
+scene.add(paddle);
+
+// =====================================================
+// BALL FACTORY
+// =====================================================
+function createBallObject(x, y) {
+    const g = new THREE.Group();
+    const core = new THREE.Mesh(
+        new THREE.SphereGeometry(0.24, 16, 16),
+        new THREE.MeshStandardMaterial({ color: 0x00ffff, emissive: 0x00ffff, emissiveIntensity: 1.6 })
+    );
+    g.add(core);
+    const halo = new THREE.Mesh(
+        new THREE.TorusGeometry(0.36, 0.055, 6, 20),
+        new THREE.MeshStandardMaterial({ color: 0xff00ff, emissive: 0xff00ff, emissiveIntensity: 1.0, transparent: true, opacity: 0.7 })
+    );
+    g.add(halo);
+    g.position.set(x, y, 0);
+    scene.add(g);
+    return { group: g, halo, vx: 0, vy: 0, attached: true };
+}
+
+// =====================================================
+// BRICKS
+// =====================================================
+const BRICK_DEFS = [
+    { color: 0x00ffff, emissive: 0x008888, hp: 1, score: 10 },
+    { color: 0xff00ff, emissive: 0x880088, hp: 1, score: 10 },
+    { color: 0xffff00, emissive: 0x888800, hp: 1, score: 15 },
+    { color: 0x00ff88, emissive: 0x008844, hp: 1, score: 15 },
+    { color: 0xff6600, emissive: 0x883300, hp: 2, score: 30 },
+];
+
+function buildBricks() {
+    const list = [];
+    const totalW = BRICK_COLS * (BRICK_W + BRICK_GAP_X) - BRICK_GAP_X;
+    const startX = -totalW / 2 + BRICK_W / 2;
+    const startY = 6.5;
+    for (let row = 0; row < BRICK_ROWS; row++) {
+        const def = BRICK_DEFS[row % BRICK_DEFS.length];
+        for (let col = 0; col < BRICK_COLS; col++) {
+            const g = new THREE.Group();
+            const body = new THREE.Mesh(
+                new THREE.BoxGeometry(BRICK_W - 0.08, BRICK_H - 0.08, 0.5),
+                new THREE.MeshStandardMaterial({
+                    color: def.color, emissive: def.emissive,
+                    emissiveIntensity: 0.5, roughness: 0.2, metalness: 0.65
+                })
+            );
+            g.add(body);
+            // Corner accent gems
+            const gemGeo = new THREE.OctahedronGeometry(0.11, 0);
+            const gemMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: def.color, emissiveIntensity: 1.2 });
+            [-0.62, 0.62].forEach(dx => {
+                const gem = new THREE.Mesh(gemGeo, gemMat);
+                gem.position.set(dx, 0, 0.28);
+                g.add(gem);
+            });
+            const x = startX + col * (BRICK_W + BRICK_GAP_X);
+            const y = startY - row * (BRICK_H + BRICK_GAP_Y);
+            g.position.set(x, y, 0);
+            scene.add(g);
+            list.push({ group: g, x, y, hp: def.hp, maxHp: def.hp, score: def.score, color: def.color });
+        }
+    }
+    return list;
+}
+
+// =====================================================
+// POWER-UPS
+// =====================================================
+const POWERUP_DEFS = [
+    { type: 'wide',      color: 0x00ffff, emissive: 0x009999, label: 'WIDE PADDLE' },
+    { type: 'slow',      color: 0xffff00, emissive: 0x888800, label: 'SLOW BALL'   },
+    { type: 'shield',    color: 0x00ff88, emissive: 0x006633, label: 'SHIELD'      },
+    { type: 'multiball', color: 0xff00ff, emissive: 0x880088, label: 'MULTI-BALL'  },
+];
+
+function maybeSeedPowerup(x, y) {
+    if (Math.random() > 0.28) return null;
+    const def = POWERUP_DEFS[Math.floor(Math.random() * POWERUP_DEFS.length)];
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(
+        new THREE.OctahedronGeometry(0.28, 0),
+        new THREE.MeshStandardMaterial({ color: def.color, emissive: def.emissive, emissiveIntensity: 1.0 })
+    ));
+    g.add(Object.assign(new THREE.Mesh(
+        new THREE.TorusGeometry(0.42, 0.055, 4, 16),
+        new THREE.MeshStandardMaterial({ color: def.color, emissive: def.emissive, emissiveIntensity: 0.8, transparent: true, opacity: 0.6 })
+    ), {}));
+    g.position.set(x, y, 0);
+    scene.add(g);
+    return { group: g, type: def.type, label: def.label, vy: -0.065 };
+}
+
+// =====================================================
+// PARTICLES
+// =====================================================
+const particlePool = [];
+for (let i = 0; i < 120; i++) {
+    const m = new THREE.Mesh(
+        new THREE.SphereGeometry(0.09, 4, 4),
+        new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 1, transparent: true, opacity: 0 })
+    );
+    m.visible = false;
+    scene.add(m);
+    particlePool.push({ mesh: m, life: 0, maxLife: 0, vx: 0, vy: 0 });
+}
+
+function spawnExplosion(x, y, color) {
+    const avail = particlePool.filter(p => p.life <= 0);
+    for (let i = 0; i < Math.min(12, avail.length); i++) {
+        const p = avail[i];
+        const angle = (Math.PI * 2 * i) / 12 + Math.random() * 0.5;
+        const speed = 0.04 + Math.random() * 0.1;
+        p.mesh.position.set(x, y, 0.3);
+        p.mesh.material.color.setHex(color);
+        p.mesh.material.emissive.setHex(color);
+        p.mesh.material.opacity = 1;
+        p.mesh.visible = true;
+        p.vx = Math.cos(angle) * speed;
+        p.vy = Math.sin(angle) * speed;
+        p.life = 35;
+        p.maxLife = 35;
+    }
+}
+
+// Ball trail pool
+const trailPool = [];
+for (let i = 0; i < 20; i++) {
+    const m = new THREE.Mesh(
+        new THREE.SphereGeometry(0.07, 4, 4),
+        new THREE.MeshStandardMaterial({ color: 0x00ffff, emissive: 0x00ffff, emissiveIntensity: 1, transparent: true, opacity: 0 })
+    );
+    m.visible = false;
+    scene.add(m);
+    trailPool.push({ mesh: m, life: 0 });
+}
+
+// =====================================================
+// SHIELD MESH
+// =====================================================
+const shieldMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(PLAY_W * 2 + 1.0, 0.28, 0.45),
+    new THREE.MeshStandardMaterial({ color: 0x00ff88, emissive: 0x00ff88, emissiveIntensity: 0.9, transparent: true, opacity: 0.55 })
+);
+shieldMesh.position.set(0, PADDLE_Y - 0.75, 0);
+shieldMesh.visible = false;
+scene.add(shieldMesh);
+
+// =====================================================
+// GAME STATE
+// =====================================================
+let score = 0, lives = 3, frame = 0;
+let gameRunning = false, gameStarted = false;
+let paddleX = 0, paddleW = 3.6;
+let wideTimer = 0, slowTimer = 0, shieldActive = false;
+let balls = [], bricks = [], powerups = [];
+
+// =====================================================
+// INPUT
+// =====================================================
+const keys = {};
+let touchLeft = false, touchRight = false;
+
+document.addEventListener('keydown', e => {
+    keys[e.code] = true;
+    if (e.code === 'Space') {
+        e.preventDefault();
+        if (!gameStarted) { startGame(); return; }
+        launchAttachedBalls();
+    }
+});
+document.addEventListener('keyup', e => { keys[e.code] = false; });
+
+document.getElementById('btn-left').addEventListener('touchstart', e => { e.preventDefault(); touchLeft = true; document.getElementById('btn-left').classList.add('pressed'); }, { passive: false });
+document.getElementById('btn-left').addEventListener('touchend',   e => { e.preventDefault(); touchLeft = false; document.getElementById('btn-left').classList.remove('pressed'); });
+document.getElementById('btn-right').addEventListener('touchstart',e => { e.preventDefault(); touchRight = true; document.getElementById('btn-right').classList.add('pressed'); }, { passive: false });
+document.getElementById('btn-right').addEventListener('touchend',  e => { e.preventDefault(); touchRight = false; document.getElementById('btn-right').classList.remove('pressed'); });
+
+// Tap game canvas to launch ball
+renderer.domElement.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (!gameStarted) { startGame(); return; }
+    launchAttachedBalls();
+}, { passive: false });
+
+function launchAttachedBalls() {
+    let launched = false;
+    balls.forEach(b => {
+        if (b.attached) {
+            b.attached = false;
+            const angle = Math.PI / 2 + (Math.random() - 0.5) * 0.6;
+            b.vx = Math.cos(angle) * BALL_SPEED;
+            b.vy = Math.sin(angle) * BALL_SPEED;
+            launched = true;
+        }
+    });
+    if (launched) playTone(500, 'square', 0.08, 0.2);
+}
+
+// =====================================================
+// UI HELPERS
+// =====================================================
+function setScore(v) { score = v; document.getElementById('score').textContent = 'SCORE: ' + score; }
+function setLives(v) {
+    lives = v;
+    document.getElementById('lives').textContent = Array(Math.max(0, lives)).fill('♥').join(' ') || '☆';
+}
+function refreshPowerupHUD() {
+    const parts = [];
+    if (wideTimer > 0) parts.push('WIDE PADDLE');
+    if (slowTimer > 0) parts.push('SLOW BALL');
+    if (shieldActive)  parts.push('SHIELD');
+    document.getElementById('powerup-status').textContent = parts.length ? '⚡ ' + parts.join(' | ') : '';
+}
+function flashPowerupMsg(msg) {
+    document.getElementById('powerup-status').textContent = '⚡ ' + msg + '!';
+    setTimeout(refreshPowerupHUD, 2200);
+}
+
+// =====================================================
+// START / RESET
+// =====================================================
+function startGame() {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    // Clear old objects
+    balls.forEach(b => scene.remove(b.group));
+    bricks.forEach(b => scene.remove(b.group));
+    powerups.forEach(p => scene.remove(p.group));
+    balls = []; bricks = []; powerups = [];
+
+    // Reset state
+    setScore(0); setLives(3);
+    frame = 0; paddleX = 0; paddleW = 3.6;
+    wideTimer = 0; slowTimer = 0; shieldActive = false;
+    shieldMesh.visible = false;
+    paddle.position.x = 0;
+    paddle.scale.x = 1;
+    refreshPowerupHUD();
+
+    // Fresh ball attached to paddle
+    balls.push(createBallObject(0, PADDLE_Y + 0.6));
+
+    // Build bricks
+    bricks = buildBricks();
+
+    // Hide all screens
+    ['title-screen','gameover-screen','win-screen'].forEach(id =>
+        document.getElementById(id).classList.add('hidden'));
+
+    gameRunning = true;
+    gameStarted = true;
+    startBgMusic();
+}
+
+document.getElementById('title-screen').addEventListener('click',    () => { if (!gameStarted) startGame(); });
+document.getElementById('title-screen').addEventListener('touchend', e => { e.preventDefault(); if (!gameStarted) startGame(); }, { passive: false });
+document.getElementById('restart-btn').addEventListener('click',     startGame);
+document.getElementById('restart-btn').addEventListener('touchend',  e => { e.preventDefault(); startGame(); }, { passive: false });
+document.getElementById('win-restart-btn').addEventListener('click',    startGame);
+document.getElementById('win-restart-btn').addEventListener('touchend', e => { e.preventDefault(); startGame(); }, { passive: false });
+
+// =====================================================
+// GAME OVER / WIN
+// =====================================================
+function triggerGameOver() {
+    gameRunning = false; gameStarted = false;
+    document.getElementById('final-score').textContent = 'Score: ' + score;
+    document.getElementById('gameover-screen').classList.remove('hidden');
+    playTone(220, 'sawtooth', 0.5, 0.4);
+    setTimeout(() => playTone(165, 'sawtooth', 0.7, 0.4), 350);
+}
+
+function triggerWin() {
+    gameRunning = false; gameStarted = false;
+    document.getElementById('win-score').textContent = 'Score: ' + score;
+    document.getElementById('win-screen').classList.remove('hidden');
+    [523.25, 659.25, 783.99, 1046.50].forEach((f, i) =>
+        setTimeout(() => playTone(f, 'triangle', 0.35, 0.45), i * 220));
+}
+
+// =====================================================
+// LOSE LIFE
+// =====================================================
+function loseLife() {
+    // Shield saves the ball — breaks instead of losing a life
+    if (shieldActive) {
+        shieldActive = false;
+        shieldMesh.visible = false;
+        refreshPowerupHUD();
+        resetBallToPaddle();
+        playTone(350, 'triangle', 0.3, 0.35);
+        return;
+    }
+    setLives(lives - 1);
+    playTone(180, 'sawtooth', 0.45, 0.45);
+    if (lives <= 0) { triggerGameOver(); return; }
+    resetBallToPaddle();
+}
+
+function resetBallToPaddle() {
+    balls.forEach(b => scene.remove(b.group));
+    balls = [];
+    balls.push(createBallObject(paddleX, PADDLE_Y + 0.6));
+    wideTimer = 0; slowTimer = 0;
+    paddle.scale.x = 1; paddleW = 3.6;
+    refreshPowerupHUD();
+}
+
+// =====================================================
+// AABB COLLISION
+// =====================================================
+function aabb(ax, ay, aw, ah, bx, by, bw, bh) {
+    return Math.abs(ax - bx) < (aw + bw) / 2 &&
+           Math.abs(ay - by) < (ah + bh) / 2;
+}
+
+// =====================================================
+// APPLY POWER-UP
+// =====================================================
+function applyPowerup(type, label) {
+    playTone(880, 'triangle', 0.18, 0.4);
+    flashPowerupMsg(label);
+    switch (type) {
+        case 'wide':
+            paddleW = 6.2;
+            paddle.scale.x = paddleW / 3.6;
+            wideTimer = 600;
+            break;
+        case 'slow':
+            slowTimer = 600;
+            break;
+        case 'shield':
+            shieldActive = true;
+            shieldMesh.visible = true;
+            break;
+        case 'multiball': {
+            const src = balls.find(b => !b.attached) || balls[0];
+            if (!src) break;
+            for (let i = 0; i < 2; i++) {
+                const nb = createBallObject(src.group.position.x, src.group.position.y);
+                nb.attached = false;
+                const a = Math.PI / 2 + (Math.random() - 0.5) * 2.0;
+                nb.vx = Math.cos(a) * BALL_SPEED;
+                nb.vy = Math.sin(a) * BALL_SPEED;
+                balls.push(nb);
+            }
+            break;
+        }
+    }
+    refreshPowerupHUD();
+}
+
+// =====================================================
+// MAIN UPDATE
+// =====================================================
+function update() {
+    if (!gameRunning) return;
+    frame++;
+
+    // --- Paddle movement ---
+    const pSpeed = 0.19;
+    if (keys['ArrowLeft'] || keys['KeyA'] || touchLeft)  paddleX -= pSpeed;
+    if (keys['ArrowRight']|| keys['KeyD'] || touchRight) paddleX += pSpeed;
+    const halfPW = paddleW / 2 + 0.1;
+    paddleX = Math.max(-PLAY_W + halfPW, Math.min(PLAY_W - halfPW, paddleX));
+    paddle.position.x = paddleX;
+
+    // Power-up timers
+    if (wideTimer > 0) {
+        wideTimer--;
+        if (wideTimer === 0) { paddleW = 3.6; paddle.scale.x = 1; refreshPowerupHUD(); }
+    }
+    if (slowTimer > 0) {
+        slowTimer--;
+        if (slowTimer === 0) refreshPowerupHUD();
+    }
+    const speedMult = slowTimer > 0 ? 0.48 : 1.0;
+
+    // --- Ball update ---
+    let anyLost = false;
+    for (let bi = balls.length - 1; bi >= 0; bi--) {
+        const b = balls[bi];
+        if (b.attached) {
+            b.group.position.set(paddleX, PADDLE_Y + 0.6, 0);
+            continue;
+        }
+
+        b.group.position.x += b.vx * speedMult;
+        b.group.position.y += b.vy * speedMult;
+        const bx = b.group.position.x;
+        const by = b.group.position.y;
+
+        // Rotate halo
+        b.halo.rotation.x += 0.06;
+        b.halo.rotation.z += 0.04;
+
+        // Wall bounces
+        if (bx > PLAY_W - 0.24)  { b.vx = -Math.abs(b.vx); playTone(280, 'square', 0.05, 0.14); }
+        if (bx < -PLAY_W + 0.24) { b.vx =  Math.abs(b.vx); playTone(280, 'square', 0.05, 0.14); }
+        if (by > PLAY_H - 0.24)  { b.vy = -Math.abs(b.vy); playTone(320, 'square', 0.05, 0.14); }
+
+        // Paddle bounce
+        if (b.vy < 0 && aabb(bx, by, 0.48, 0.48, paddleX, PADDLE_Y, paddleW, 0.55)) {
+            b.vy = Math.abs(b.vy);
+            const hit = (bx - paddleX) / (paddleW / 2);
+            b.vx = hit * 0.22;
+            // Normalise speed
+            const spd = Math.hypot(b.vx, b.vy);
+            b.vx = (b.vx / spd) * BALL_SPEED;
+            b.vy = (b.vy / spd) * BALL_SPEED;
+            playTone(520, 'square', 0.08, 0.22);
+        }
+
+        // Shield bounce (one-shot: breaks on hit)
+        if (shieldActive && b.vy < 0 &&
+            aabb(bx, by, 0.48, 0.48, 0, PADDLE_Y - 0.75, PLAY_W * 2 + 1.0, 0.35)) {
+            b.vy = Math.abs(b.vy);
+            shieldActive = false;
+            shieldMesh.visible = false;
+            refreshPowerupHUD();
+            playTone(420, 'square', 0.1, 0.3);
+        }
+
+        // Ball lost
+        if (by < -PLAY_H - 1.5) {
+            scene.remove(b.group);
+            balls.splice(bi, 1);
+            anyLost = true;
+        }
+
+        // Trail
+        if (frame % 3 === 0) {
+            const t = trailPool.find(p => p.life <= 0);
+            if (t) {
+                t.mesh.position.set(bx, by, 0.1);
+                t.mesh.visible = true;
+                t.mesh.material.opacity = 0.6;
+                t.life = 14;
+            }
+        }
+    }
+    if (anyLost && balls.length === 0) loseLife();
+
+    // --- Trail fade ---
+    trailPool.forEach(t => {
+        if (t.life > 0) {
+            t.life--;
+            t.mesh.material.opacity = (t.life / 14) * 0.55;
+            if (t.life <= 0) t.mesh.visible = false;
+        }
+    });
+
+    // --- Brick collisions ---
+    for (let i = bricks.length - 1; i >= 0; i--) {
+        const br = bricks[i];
+        for (let j = 0; j < balls.length; j++) {
+            const b = balls[j];
+            if (b.attached) continue;
+            const bx = b.group.position.x;
+            const by = b.group.position.y;
+            if (!aabb(bx, by, 0.48, 0.48, br.x, br.y, BRICK_W, BRICK_H)) continue;
+
+            // Determine bounce axis
+            const overlapX = (BRICK_W  / 2 + 0.24) - Math.abs(bx - br.x);
+            const overlapY = (BRICK_H / 2 + 0.24) - Math.abs(by - br.y);
+            if (overlapX < overlapY) {
+                b.vx = bx < br.x ? -Math.abs(b.vx) : Math.abs(b.vx);
+            } else {
+                b.vy = by < br.y ? -Math.abs(b.vy) : Math.abs(b.vy);
+            }
+
+            br.hp--;
+            if (br.hp <= 0) {
+                spawnExplosion(br.x, br.y, br.color);
+                const pu = maybeSeedPowerup(br.x, br.y);
+                if (pu) powerups.push(pu);
+                scene.remove(br.group);
+                bricks.splice(i, 1);
+                setScore(score + br.score);
+                playTone(600 + Math.random() * 300, 'triangle', 0.12, 0.28);
+            } else {
+                // Flash remaining hp brick
+                br.group.children.forEach(c => {
+                    if (c.material) { c.material.emissiveIntensity = 2.5; }
+                });
+                setTimeout(() => {
+                    br.group.children.forEach(c => {
+                        if (c.material) c.material.emissiveIntensity = 0.5;
+                    });
+                }, 90);
+                playTone(380, 'square', 0.06, 0.18);
+            }
+            break; // one brick per ball per frame
+        }
+    }
+
+    // Win check
+    if (bricks.length === 0) { triggerWin(); return; }
+
+    // --- Power-up drops ---
+    for (let i = powerups.length - 1; i >= 0; i--) {
+        const p = powerups[i];
+        p.group.position.y += p.vy;
+        p.group.rotation.y  += 0.06;
+        p.group.children[0].rotation.x += 0.05;
+
+        const px = p.group.position.x;
+        const py = p.group.position.y;
+
+        // Collect
+        if (aabb(px, py, 0.65, 0.65, paddleX, PADDLE_Y, paddleW, 0.55)) {
+            applyPowerup(p.type, p.label);
+            scene.remove(p.group);
+            powerups.splice(i, 1);
+            continue;
+        }
+        if (py < -PLAY_H - 2) {
+            scene.remove(p.group);
+            powerups.splice(i, 1);
+        }
+    }
+
+    // --- Particle update ---
+    particlePool.forEach(p => {
+        if (p.life <= 0) return;
+        p.mesh.position.x += p.vx;
+        p.mesh.position.y += p.vy;
+        p.vy -= 0.002;
+        p.life--;
+        p.mesh.material.opacity = p.life / p.maxLife;
+        if (p.life <= 0) p.mesh.visible = false;
+    });
+
+    // Gentle brick float
+    bricks.forEach((b, idx) => {
+        b.group.position.z = Math.sin(frame * 0.018 + idx * 0.4) * 0.09;
+    });
+
+    // Ambient animations
+    planet.rotation.y     += 0.0008;
+    planetRing.rotation.z += 0.0004;
+    pointLight.intensity   = 1.5 + Math.sin(frame * 0.05) * 0.4;
+    pinkLight.intensity    = 0.6 + Math.sin(frame * 0.03 + 1) * 0.25;
+    shieldMesh.material.opacity = shieldActive ? 0.45 + Math.sin(frame * 0.1) * 0.1 : 0;
+}
+
+// =====================================================
+// RENDER LOOP
+// =====================================================
+(function loop() {
+    requestAnimationFrame(loop);
+    update();
+    renderer.render(scene, camera);
+})();
+
+// =====================================================
+// RESIZE
+// =====================================================
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>
